@@ -7,17 +7,26 @@ class StackVM {
     private int ic;
     private int sp;
     private int ssp;
+
+    private int hp;
+
+    private int shp;
     private ArrayList<Integer> memory;
     private int type;
     private int data;
     private int running;
 
-    public StackVM() {
-        final int CAPACITY = 1_000_000;
+    public void setRunning(int running) {
+        this.running = running;
+    }
 
+    public StackVM() {
+        final int CAPACITY = 250;  // 1_000_000;
         ic = 0;
         sp = 0;
         ssp = 0;
+        hp = CAPACITY -1;
+        shp = CAPACITY -1;
         memory = new ArrayList<>(CAPACITY);
         type = 0;
         data = 0;
@@ -130,6 +139,18 @@ class StackVM {
             case 14:
                 ins_invoke_native();
                 break;
+            case 15:
+                ins_jump_zero();
+                break;
+            case 16:
+                ins_jump_one();
+                break;
+            case 17:
+                ins_pop();
+                break;
+            case 18:
+                ins_value_return();
+                break;
         }
     }
 
@@ -202,6 +223,12 @@ class StackVM {
             case 2:
                 memory.set(sp, ssp);
                 break;
+            case 3:
+                memory.set(sp, hp);
+                break;
+            case 4:
+                memory.set(sp, shp);
+                break;
         }
     }
 
@@ -215,6 +242,12 @@ class StackVM {
                 break;
             case 2:
                 ssp = memory.get(sp);
+                break;
+            case 3:
+                hp = memory.get(sp);
+                break;
+            case 4:
+                shp = memory.get(sp);
                 break;
         }
         sp -= 2;
@@ -259,11 +292,46 @@ class StackVM {
             throw new RuntimeException(e);
         }
 
-        int res = func.exec(parameters);
+        int res = func.exec(parameters, this);
         if (func.hasReturn()) {
             sp++;
             memory.set(sp, res);
         }
+    }
+
+    private void ins_jump_zero() {
+        int target = memory.get(sp);
+        int cond = memory.get(sp - 1);
+
+        sp -= 2;
+
+        if (cond == 0) {
+            ic = target;
+        }
+    }
+
+    private void ins_jump_one() {
+        int target = memory.get(sp);
+        int cond = memory.get(sp - 1);
+
+        sp -= 2;
+
+        if (cond == 1) {
+            ic = target;
+        }
+    }
+
+    private void ins_pop() {
+        sp--;
+    }
+
+    private void ins_value_return() {
+        int target = memory.get(sp);
+        int value = memory.get(sp + 1);
+        sp--;
+        ic = target;
+        sp++;
+        memory.set(sp, value);
     }
 
     private static class Debug {
@@ -277,10 +345,6 @@ class StackVM {
             clearConsole();
             for (int i = 0; i < vm.memory.size(); i++) {
                 final int x = vm.memory.get(i);
-
-                if (i > vm.sp) {
-                    break;
-                }
 
                 String name;
                 if ((name = isIns(x)) != null) {
@@ -297,7 +361,13 @@ class StackVM {
                     System.out.print("  <-- ssp");
                 }
                 if (i == vm.ic) {
-                    System.out.print("  <-- pc");
+                    System.out.print("  <-- ic");
+                }
+                if (i == vm.hp) {
+                    System.out.print("  <-- hp");
+                }
+                if (i == vm.shp) {
+                    System.out.print("  <-- shp");
                 }
 
                 System.out.print("\n");

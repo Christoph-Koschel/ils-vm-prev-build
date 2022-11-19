@@ -12,9 +12,9 @@ public class NativeFunction {
         numbers = new HashMap<>();
     }
 
-    public static void declare(NativeFunctionWrapper func) {
-        numbers.put(func.getName(), numbers.size());
-        functions.put(numbers.size() - 1, func);
+    public static void declare(int i, NativeFunctionWrapper func) {
+        numbers.put(func.getName(), i);
+        functions.put(i, func);
     }
 
     public static NativeFunctionWrapper get(int name) throws Exception {

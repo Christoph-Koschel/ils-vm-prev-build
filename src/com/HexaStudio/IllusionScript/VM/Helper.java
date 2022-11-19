@@ -117,6 +117,12 @@ public class Helper {
         };
     }
 
+    public static int[] buildStackReturn() {
+        return new int[]{
+
+        };
+    }
+
     public static int[] merge_array(int[] left, int[] right) {
         int[] x = new int[left.length + right.length];
         for (int i = 0; i < left.length; i++) {
