@@ -15,7 +15,11 @@ public enum Instructions {
     SAVE("SAVE", 0x4000000B),
     SWAP("SWAP", 0x4000000C),
     DUP("DUP", 0x4000000D),
-    INVOKE_NATIVE("INVOKE_VIRTUAL", 0x4000000E);
+    INVOKE_NATIVE("INVOKE_VIRTUAL", 0x4000000E),
+    JUMP_ZERO("JUMP_ZERO", 0x4000000F),
+    JUMP_ONE("JUMP_ONE", 0x40000010),
+    POP("POP", 0x40000011),
+    VALUE_RETURN("VALUE_RETURN", 0x40000012);
 
     public final String name;
     public final int value;
